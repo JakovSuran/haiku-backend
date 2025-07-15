@@ -1,0 +1,7 @@
+services:
+  - type: cron
+    name: daily-haiku
+    schedule: "0 0 * * *"
+    env: python
+    buildCommand: ""
+    startCommand: "python generate_haiku.py"
