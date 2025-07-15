@@ -44,9 +44,14 @@ def pick_next_image():
 
     return next_image
 
+import base64
+
 def generate_haiku_from_image(image_path):
     print(f"Generating haiku from: {image_path}")
     with open(image_path, "rb") as img_file:
+        image_data = base64.b64encode(img_file.read()).decode("utf-8")
+        data_url = f"data:image/jpeg;base64,{image_data}"
+
         response = openai.ChatCompletion.create(
             model="gpt-4-vision-preview",
             messages=[
@@ -54,19 +59,15 @@ def generate_haiku_from_image(image_path):
                     "role": "user",
                     "content": [
                         {"type": "text", "text": "Write a haiku inspired by this image. Do not explain it."},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                # You may need to adjust this part depending on OpenAI's method of handling image uploads
-                                "url": f"data:image/jpeg;base64,{img_file.read().encode('base64')}"
-                            }
-                        }
+                        {"type": "image_url", "image_url": {"url": data_url}}
                     ]
                 }
             ],
             max_tokens=100
         )
+
     return response['choices'][0]['message']['content'].strip()
+
 
 def save_haiku(image_name, haiku_text):
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
