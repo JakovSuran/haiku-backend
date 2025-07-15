@@ -1,7 +1,7 @@
 import os
 import json
 import openai
-from datetime import datetime
+from datetime import datetime, UTC
 import base64
 
 # Load OpenAI key from environment
