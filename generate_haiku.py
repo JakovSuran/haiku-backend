@@ -48,23 +48,25 @@ def pick_next_image():
 
 def generate_haiku_from_image(image_path):
     print(f"Generating haiku from: {image_path}")
-    with open(image_path, "rb") as img_file:
-        image_data = base64.b64encode(img_file.read()).decode("utf-8")
-        data_url = f"data:image/jpeg;base64,{image_data}"
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4-vision-preview",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Write a haiku inspired by this image. Do not explain it."},
-                        {"type": "image_url", "image_url": {"url": data_url}}
-                    ]
-                }
-            ],
-            max_tokens=100
-        )
+    with open(image_path, "rb") as img_file:
+        image_bytes = img_file.read()
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        data_url = f"data:image/jpeg;base64,{image_base64}"
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4-vision-preview",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Write a haiku inspired by this image. Do not explain it."},
+                    {"type": "image_url", "image_url": {"url": data_url}}
+                ]
+            }
+        ],
+        max_tokens=100
+    )
 
     return response['choices'][0]['message']['content'].strip()
 
