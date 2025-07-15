@@ -82,11 +82,28 @@ def save_haiku(image_name, haiku_text):
         json.dump(output, f, indent=2)
     print(f"Saved haiku to {OUTPUT_FILE}")
 
+from ftplib import FTP
+
+def upload_to_bluehost(local_file_path, remote_file_name):
+    ftp_host = os.getenv("FTP_HOST")         # e.g. ftp.yourdomain.com
+    ftp_user = os.getenv("FTP_USER")         # your Bluehost FTP username
+    ftp_pass = os.getenv("FTP_PASS")         # your password
+    ftp_path = os.getenv("FTP_PATH", "public_html")  # folder to upload to
+
+    with FTP(ftp_host) as ftp:
+        ftp.login(ftp_user, ftp_pass)
+        ftp.cwd(ftp_path)
+        with open(local_file_path, 'rb') as file:
+            ftp.storbinary(f'STOR {remote_file_name}', file)
+
+    print(f"✅ Uploaded {remote_file_name} to Bluehost")
+
 def main():
     image_name = pick_next_image()
     image_path = os.path.join(IMAGE_FOLDER, image_name)
     haiku = generate_haiku_from_image(image_path)
     save_haiku(image_name, haiku)
+    upload_to_bluehost(OUTPUT_FILE, "haiku.json")
 
 if __name__ == "__main__":
     main()
