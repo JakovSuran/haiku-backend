@@ -2,6 +2,7 @@ import os
 import json
 import openai
 from datetime import datetime
+import base64
 
 # Load OpenAI key from environment
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -15,10 +16,12 @@ def get_all_images():
     return sorted([f for f in os.listdir(IMAGE_FOLDER) if f.lower().endswith(('.jpg', '.jpeg', '.png'))])
 
 def load_used_images():
-    if os.path.exists(USED_IMAGES_FILE):
+    try:
         with open(USED_IMAGES_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    return []
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
 
 def save_used_images(used_images):
     with open(USED_IMAGES_FILE, "w", encoding="utf-8") as f:
@@ -42,29 +45,31 @@ def pick_next_image():
 
     return next_image
 
+
 def generate_haiku_from_image(image_path):
     print(f"Generating haiku from: {image_path}")
+
     with open(image_path, "rb") as img_file:
-        response = openai.ChatCompletion.create(
-            model="gpt-4-vision-preview",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Write a haiku inspired by this image. Do not explain it."},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                # You may need to adjust this part depending on OpenAI's method of handling image uploads
-                                "url": f"data:image/jpeg;base64,{img_file.read().encode('base64')}"
-                            }
-                        }
-                    ]
-                }
-            ],
-            max_tokens=100
-        )
+        image_bytes = img_file.read()
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        data_url = f"data:image/jpeg;base64,{image_base64}"
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4-vision-preview",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Write a haiku inspired by this image. Do not explain it."},
+                    {"type": "image_url", "image_url": {"url": data_url}}
+                ]
+            }
+        ],
+        max_tokens=100
+    )
+
     return response['choices'][0]['message']['content'].strip()
+
 
 def save_haiku(image_name, haiku_text):
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
@@ -85,3 +90,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+print(">>> using base64.b64encode().decode() method")
