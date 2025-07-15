@@ -84,19 +84,32 @@ def save_haiku(image_name, haiku_text):
 
 from ftplib import FTP
 
+from ftplib import FTP
+
 def upload_to_bluehost(local_file_path, remote_file_name):
-    ftp_host = os.getenv("FTP_HOST")         # e.g. ftp.yourdomain.com
-    ftp_user = os.getenv("FTP_USER")         # your Bluehost FTP username
-    ftp_pass = os.getenv("FTP_PASS")         # your password
-    ftp_path = os.getenv("FTP_PATH", "public_html")  # folder to upload to
+    ftp_host = os.getenv("FTP_HOST")
+    ftp_user = os.getenv("FTP_USER")
+    ftp_pass = os.getenv("FTP_PASS")
+    ftp_path = os.getenv("FTP_PATH", "")  # leave blank for now
 
     with FTP(ftp_host) as ftp:
         ftp.login(ftp_user, ftp_pass)
-        ftp.cwd(ftp_path)
+        current = ftp.pwd()
+        print("🧭 Current FTP directory after login:", current)
+
+        # Try changing to target directory if set
+        if ftp_path:
+            try:
+                ftp.cwd(ftp_path)
+            except Exception as e:
+                print(f"❌ Failed to change to {ftp_path}: {e}")
+                return
+
         with open(local_file_path, 'rb') as file:
             ftp.storbinary(f'STOR {remote_file_name}', file)
 
-    print(f"✅ Uploaded {remote_file_name} to Bluehost")
+        print(f"✅ Uploaded {remote_file_name} to {ftp.pwd()}")
+
 
 def main():
     image_name = pick_next_image()
