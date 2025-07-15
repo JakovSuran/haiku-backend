@@ -1,7 +1,7 @@
 import os
 import json
 import openai
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 import base64
 
 # Load OpenAI key from environment
@@ -74,7 +74,7 @@ def generate_haiku_from_image(image_path):
 def save_haiku(image_name, haiku_text):
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     output = {
-        "date": datetime.now(UTC).strftime("%Y-%m-%d"),
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "image": f"https://yourdomain.com/images/{image_name}",
         "haiku": haiku_text
     }
