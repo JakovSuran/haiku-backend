@@ -74,10 +74,11 @@ def generate_haiku_from_image(image_path):
 def save_haiku(image_name, haiku_text):
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     output = {
-        "date": datetime.utcnow().strftime("%Y-%m-%d"),
-        "image": f"images/{image_name}",
+        "date": datetime.now(UTC).strftime("%Y-%m-%d"),
+        "image": f"https://yourdomain.com/images/{image_name}",
         "haiku": haiku_text
     }
+
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2)
     print(f"Saved haiku to {OUTPUT_FILE}")
@@ -117,6 +118,8 @@ def main():
     haiku = generate_haiku_from_image(image_path)
     save_haiku(image_name, haiku)
     upload_to_bluehost(OUTPUT_FILE, "haiku.json")
+    upload_to_bluehost(image_path, f"images/{image_name}")
+    
 
 if __name__ == "__main__":
     main()
