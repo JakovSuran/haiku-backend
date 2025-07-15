@@ -2,6 +2,7 @@ import os
 import json
 import openai
 from datetime import datetime
+import base64
 
 # Load OpenAI key from environment
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -44,7 +45,6 @@ def pick_next_image():
 
     return next_image
 
-import base64
 
 def generate_haiku_from_image(image_path):
     print(f"Generating haiku from: {image_path}")
