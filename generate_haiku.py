@@ -107,9 +107,11 @@ def upload_to_bluehost(local_file_path, remote_file_name):
                 return
 
         with open(local_file_path, 'rb') as file:
+            print(f"📤 Uploading {local_file_path} to {ftp_path}/{remote_file_name}")
             ftp.storbinary(f'STOR {remote_file_name}', file)
 
         print(f"✅ Uploaded {remote_file_name} to {ftp.pwd()}")
+        
 
 
 def main():
