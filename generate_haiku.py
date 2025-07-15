@@ -55,7 +55,7 @@ def generate_haiku_from_image(image_path):
         data_url = f"data:image/jpeg;base64,{image_base64}"
 
     response = openai.ChatCompletion.create(
-        model="gpt-4-vision-preview",
+        model="gpt-4o",
         messages=[
             {
                 "role": "user",
