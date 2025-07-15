@@ -75,7 +75,7 @@ def save_haiku(image_name, haiku_text):
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     output = {
         "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "image": f"https://yourdomain.com/images/{image_name}",
+        "image": f"https://dailykorina.com/haiku/images/{image_name}",
         "haiku": haiku_text
     }
 
