@@ -15,10 +15,12 @@ def get_all_images():
     return sorted([f for f in os.listdir(IMAGE_FOLDER) if f.lower().endswith(('.jpg', '.jpeg', '.png'))])
 
 def load_used_images():
-    if os.path.exists(USED_IMAGES_FILE):
+    try:
         with open(USED_IMAGES_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    return []
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
 
 def save_used_images(used_images):
     with open(USED_IMAGES_FILE, "w", encoding="utf-8") as f:
