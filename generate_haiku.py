@@ -44,6 +44,12 @@ def pick_next_image(remote_images):
     try:
         response = requests.get("https://dailykorina.com/haiku/haiku.json")
         response.raise_for_status()
+
+        if not response.text.strip():
+            raise ValueError("haiku.json is empty")
+
+        print("📄 haiku.json content:", response.text)
+
         last_data = response.json()
         last_image = os.path.basename(last_data.get("image", "1.jpg"))
         last_index = remote_images.index(last_image)
@@ -53,6 +59,7 @@ def pick_next_image(remote_images):
     except Exception as e:
         print(f"⚠️ Could not read haiku.json: {e}")
         return remote_images[0]
+
 
 def download_image(image_name):
     url = f"https://dailykorina.com/haiku/images/{urllib.parse.quote(image_name)}"
