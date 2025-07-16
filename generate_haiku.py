@@ -70,6 +70,8 @@ def pick_next_image(remote_images):
     except Exception as e:
         print(f"⚠️ Could not read haiku.json: {e}")
         return remote_images[0]
+    if os.stat(haiku_file).st_size == 0:
+        raise ValueError("haiku.json is empty")
 
 
 
@@ -141,8 +143,9 @@ def upload_to_bluehost(local_path, remote_name):
             try:
                 ftp.cwd(ftp_path)
             except Exception as e:
-                print(f"❌ Failed to change to {ftp_path}: {e}")
-                return
+                print(f"⚠️ Could not read haiku.json: {e}")
+                return remote_images[0]
+
 
         with open(local_path, "rb") as f:
             print(f"📤 Uploading {local_path} as {remote_name}")
@@ -162,7 +165,7 @@ def main():
     image_path, image_url = download_image(image_name)
     haiku = generate_haiku_from_image(image_path)
 
-    save_haiku(image_name, haiku)
+    save_haiku(image_name, haiku, image_url)
     upload_to_bluehost(OUTPUT_FILE, "haiku.json")
 
     print("✅ Daily haiku generated and uploaded.")
