@@ -24,10 +24,9 @@ def fetch_remote_image_list():
 
     with FTP(ftp_host) as ftp:
         ftp.login(ftp_user, ftp_pass)
-        ftp.cwd("public_html")  # start at root
-
         if ftp_path:
             ftp.cwd(ftp_path)
+
 
         files = ftp.nlst()
         image_files = [f for f in files if f.lower().endswith((".jpg", ".jpeg", ".png"))]
@@ -128,6 +127,8 @@ def upload_to_bluehost(local_path, remote_name):
             ftp.storbinary(f"STOR {remote_name}", f)
 
         print(f"✅ Uploaded {remote_name} to {ftp.pwd()}")
+        print("🔍 FTP current directory:", ftp.pwd())
+
 
 def main():
     image_name = pick_next_image()
