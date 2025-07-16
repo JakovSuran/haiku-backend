@@ -42,7 +42,14 @@ def fetch_remote_image_list():
 
 def pick_next_image(remote_images):
     try:
-        response = requests.get("https://dailykorina.com/haiku/haiku.json")
+        response = requests.get(
+    "https://dailykorina.com/haiku/haiku.json",
+    headers={
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
+    }
+)
+
         response.raise_for_status()
 
         if not response.text.strip():
