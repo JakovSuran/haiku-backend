@@ -73,15 +73,21 @@ def pick_next_image():
 
 
 def download_image(image_name):
-    url = f"{BLUEHOST_IMAGE_URL}/{urllib.parse.quote(image_name)}"
+    url = f"https://dailykorina.com/haiku/images/{urllib.parse.quote(image_name)}"
     print(f"⬇️ Downloading image from: {url}")
-    response = requests.get(url)
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
+
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
 
     local_path = f"/tmp/{image_name}"
     with open(local_path, "wb") as f:
         f.write(response.content)
     return local_path, url
+
 
 def generate_haiku_from_image(image_path):
     print(f"🧠 Generating haiku from: {image_path}")
