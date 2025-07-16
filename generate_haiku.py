@@ -77,7 +77,8 @@ def download_image(image_name):
     print(f"⬇️ Downloading image from: {url}")
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8"
     }
 
     response = requests.get(url, headers=headers)
@@ -87,6 +88,7 @@ def download_image(image_name):
     with open(local_path, "wb") as f:
         f.write(response.content)
     return local_path, url
+
 
 
 def generate_haiku_from_image(image_path):
