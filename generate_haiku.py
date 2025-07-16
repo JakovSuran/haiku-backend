@@ -165,7 +165,7 @@ def main():
     image_path, image_url = download_image(image_name)
     haiku = generate_haiku_from_image(image_path)
 
-    save_haiku(image_name, haiku, image_url)
+    save_haiku(image_name, haiku_text, full_url)
     upload_to_bluehost(OUTPUT_FILE, "haiku.json")
 
     print("✅ Daily haiku generated and uploaded.")
