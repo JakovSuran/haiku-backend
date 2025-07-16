@@ -144,5 +144,6 @@ def main():
 
     print("✅ Daily haiku generated and uploaded.")
 
+
 if __name__ == "__main__":
     main()
