@@ -40,31 +40,35 @@ def fetch_remote_image_list():
         image_files.sort()
         return image_files
 
+def read_remote_haiku_json():
+    ftp_host = os.getenv("FTP_HOST")
+    ftp_user = os.getenv("FTP_USER")
+    ftp_pass = os.getenv("FTP_PASS")
+    ftp_path = os.getenv("FTP_PATH", "")  # This should be the folder where haiku.json is stored
+
+    with FTP(ftp_host) as ftp:
+        ftp.login(ftp_user, ftp_pass)
+        print("📂 Logged into FTP to read haiku.json")
+
+        if ftp_path:
+            ftp.cwd(ftp_path)
+
+        lines = []
+        ftp.retrlines("RETR haiku.json", lines.append)
+        content = "\n".join(lines)
+        return json.loads(content)
+
+
 def pick_next_image(remote_images):
     try:
-        response = requests.get(
-    "https://dailykorina.com/haiku/haiku.json",
-    headers={
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "application/json"
-    }
-)
-
-        response.raise_for_status()
-
-        if not response.text.strip():
-            raise ValueError("haiku.json is empty")
-
-        print("📄 haiku.json content:", response.text)
-
-        last_data = response.json()
+        last_data = read_remote_haiku_json()
         last_image = os.path.basename(last_data.get("image", "1.jpg"))
         last_index = remote_images.index(last_image)
         next_index = (last_index + 1) % len(remote_images)
         print(f"🔁 Last image was {last_image}, next is {remote_images[next_index]}")
         return remote_images[next_index]
     except Exception as e:
-        print(f"⚠️ Could not read haiku.json: {e}")
+        print(f"⚠️ Could not read haiku.json from FTP: {e}")
         return remote_images[0]
 
 
