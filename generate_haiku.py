@@ -56,20 +56,22 @@ def save_used_images(used_images):
     with open(USED_IMAGES_FILE, "w", encoding="utf-8") as f:
         json.dump(used_images, f, indent=2)
 
-def pick_next_image():
-    all_images = fetch_remote_image_list()
-    used_images = load_used_images()
-    unused_images = [img for img in all_images if img not in used_images]
+def pick_next_image(remote_images):
+    haiku_file = "haikus/haiku.json"
 
-    if not unused_images:
-        print("All remote images used — restarting cycle.")
-        used_images = []
-        unused_images = all_images
+    try:
+        with open(haiku_file, "r", encoding="utf-8") as f:
+            last_data = json.load(f)
+            last_image = os.path.basename(last_data.get("image", "1.jpg"))
+            last_index = remote_images.index(last_image)
+            next_index = (last_index + 1) % len(remote_images)
+            print(f"🔁 Last image was {last_image}, next is {remote_images[next_index]}")
+            return remote_images[next_index]
+    except Exception as e:
+        print(f"⚠️ Could not read haiku.json: {e}")
+        return remote_images[0]
 
-    next_image = unused_images[0]
-    used_images.append(next_image)
-    save_used_images(used_images)
-    return next_image
+
 
 
 def download_image(image_name):
@@ -151,11 +153,20 @@ def upload_to_bluehost(local_path, remote_name):
 
 
 def main():
-    image_name = pick_next_image()
+    all_images = fetch_remote_image_list()
+    if not all_images:
+        print("❌ No images found on FTP.")
+        return
+
+    image_name = pick_next_image(all_images)
     image_path, image_url = download_image(image_name)
     haiku = generate_haiku_from_image(image_path)
-    save_haiku(image_name, haiku, image_url)
+
+    save_haiku(image_name, haiku)
     upload_to_bluehost(OUTPUT_FILE, "haiku.json")
+
+    print("✅ Daily haiku generated and uploaded.")
+
 
 if __name__ == "__main__":
     main()
