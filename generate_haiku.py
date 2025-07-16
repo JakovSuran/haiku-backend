@@ -101,7 +101,7 @@ def generate_haiku_from_image(image_path):
             {
                 "role": "user",
                 "content": [
-                    { "type": "text", "text": "Write a haiku inspired by this image. Do not explain it." },
+                    { "type": "text", "text": "Write a haiku inspired by this image. Do not explain it. It should have a nice mood, a nice story, a nice message, a nice feeling of love. Write it in Croatian." },
                     { "type": "image_url", "image_url": { "url": data_url } }
                 ]
             }
