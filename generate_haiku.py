@@ -10,8 +10,6 @@ from ftplib import FTP
 # Load OpenAI key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-
-
 OUTPUT_FILE = "haikus/haiku.json"
 USED_IMAGES_FILE = "haikus/used_images.json"
 BLUEHOST_IMAGE_URL = "https://dailykorina.com/haiku/images"
@@ -42,20 +40,6 @@ def fetch_remote_image_list():
         image_files.sort()
         return image_files
 
-
-
-
-def load_used_images():
-    try:
-        with open(USED_IMAGES_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
-
-def save_used_images(used_images):
-    with open(USED_IMAGES_FILE, "w", encoding="utf-8") as f:
-        json.dump(used_images, f, indent=2)
-
 def pick_next_image(remote_images):
     haiku_file = "haikus/haiku.json"
 
@@ -70,11 +54,6 @@ def pick_next_image(remote_images):
     except Exception as e:
         print(f"⚠️ Could not read haiku.json: {e}")
         return remote_images[0]
-    if os.stat(haiku_file).st_size == 0:
-        raise ValueError("haiku.json is empty")
-
-
-
 
 def download_image(image_name):
     url = f"https://dailykorina.com/haiku/images/{urllib.parse.quote(image_name)}"
@@ -93,8 +72,6 @@ def download_image(image_name):
         f.write(response.content)
     return local_path, url
 
-
-
 def generate_haiku_from_image(image_path):
     print(f"🧠 Generating haiku from: {image_path}")
     with open(image_path, "rb") as img_file:
@@ -102,19 +79,18 @@ def generate_haiku_from_image(image_path):
         data_url = f"data:image/jpeg;base64,{encoded}"
 
     response = openai.ChatCompletion.create(
-    model="gpt-4o",
-    messages=[
-        {
-            "role": "user",
-            "content": [
-                { "type": "text", "text": "Write a haiku inspired by this image. Do not explain it." },
-                { "type": "image_url", "image_url": { "url": data_url } }
-            ]
-        }
-    ],
-    max_tokens=100
-)
-
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    { "type": "text", "text": "Write a haiku inspired by this image. Do not explain it." },
+                    { "type": "image_url", "image_url": { "url": data_url } }
+                ]
+            }
+        ],
+        max_tokens=100
+    )
 
     return response.choices[0].message.content.strip()
 
@@ -143,9 +119,8 @@ def upload_to_bluehost(local_path, remote_name):
             try:
                 ftp.cwd(ftp_path)
             except Exception as e:
-                print(f"⚠️ Could not read haiku.json: {e}")
-                return remote_images[0]
-
+                print(f"⚠️ Could not change directory: {e}")
+                return
 
         with open(local_path, "rb") as f:
             print(f"📤 Uploading {local_path} as {remote_name}")
@@ -153,7 +128,6 @@ def upload_to_bluehost(local_path, remote_name):
 
         print(f"✅ Uploaded {remote_name} to {ftp.pwd()}")
         print("🔍 FTP current directory:", ftp.pwd())
-
 
 def main():
     all_images = fetch_remote_image_list()
@@ -165,11 +139,10 @@ def main():
     image_path, image_url = download_image(image_name)
     haiku = generate_haiku_from_image(image_path)
 
-    save_haiku(image_name, haiku_text, full_url)
+    save_haiku(image_name, haiku, image_url)
     upload_to_bluehost(OUTPUT_FILE, "haiku.json")
 
     print("✅ Daily haiku generated and uploaded.")
-
 
 if __name__ == "__main__":
     main()
