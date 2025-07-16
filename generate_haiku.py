@@ -97,19 +97,20 @@ def generate_haiku_from_image(image_path):
         encoded = base64.b64encode(img_file.read()).decode("utf-8")
         data_url = f"data:image/jpeg;base64,{encoded}"
 
-    response = openai.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    { "type": "text", "text": "Write a haiku inspired by this image. Do not explain it." },
-                    { "type": "image_url", "image_url": { "url": data_url } }
-                ]
-            }
-        ],
-        max_tokens=100
-    )
+    response = openai.ChatCompletion.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                { "type": "text", "text": "Write a haiku inspired by this image. Do not explain it." },
+                { "type": "image_url", "image_url": { "url": data_url } }
+            ]
+        }
+    ],
+    max_tokens=100
+)
+
 
     return response.choices[0].message.content.strip()
 
