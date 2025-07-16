@@ -41,16 +41,15 @@ def fetch_remote_image_list():
         return image_files
 
 def pick_next_image(remote_images):
-    haiku_file = "haikus/haiku.json"
-
     try:
-        with open(haiku_file, "r", encoding="utf-8") as f:
-            last_data = json.load(f)
-            last_image = os.path.basename(last_data.get("image", "1.jpg"))
-            last_index = remote_images.index(last_image)
-            next_index = (last_index + 1) % len(remote_images)
-            print(f"🔁 Last image was {last_image}, next is {remote_images[next_index]}")
-            return remote_images[next_index]
+        response = requests.get("https://dailykorina.com/haiku/haiku.json")
+        response.raise_for_status()
+        last_data = response.json()
+        last_image = os.path.basename(last_data.get("image", "1.jpg"))
+        last_index = remote_images.index(last_image)
+        next_index = (last_index + 1) % len(remote_images)
+        print(f"🔁 Last image was {last_image}, next is {remote_images[next_index]}")
+        return remote_images[next_index]
     except Exception as e:
         print(f"⚠️ Could not read haiku.json: {e}")
         return remote_images[0]
