@@ -20,19 +20,28 @@ def fetch_remote_image_list():
     ftp_host = os.getenv("FTP_HOST")
     ftp_user = os.getenv("FTP_USER")
     ftp_pass = os.getenv("FTP_PASS")
-    ftp_path = os.getenv("FTP_IMAGES_PATH", "haiku/images")  # default path to /haiku/images
+    ftp_path = os.getenv("FTP_IMAGES_PATH", "")  # can be blank
 
     with FTP(ftp_host) as ftp:
         ftp.login(ftp_user, ftp_pass)
-        if ftp_path:
-            ftp.cwd(ftp_path)
+        print("📂 Logged into FTP.")
+        print("📍 Starting in directory:", ftp.pwd())
 
+        if ftp_path:
+            try:
+                ftp.cwd(ftp_path)
+                print("✅ Changed to:", ftp.pwd())
+            except Exception as e:
+                print(f"❌ Failed to change to '{ftp_path}': {e}")
+                return []
 
         files = ftp.nlst()
+        print("📄 Files in current dir:", files)
+
         image_files = [f for f in files if f.lower().endswith((".jpg", ".jpeg", ".png"))]
         image_files.sort()
         return image_files
-        print("📂 FTP current directory after login:", ftp.pwd())
+
 
 
 
