@@ -32,6 +32,8 @@ def fetch_remote_image_list():
         image_files = [f for f in files if f.lower().endswith((".jpg", ".jpeg", ".png"))]
         image_files.sort()
         return image_files
+        print("📂 FTP current directory after login:", ftp.pwd())
+
 
 
 def load_used_images():
